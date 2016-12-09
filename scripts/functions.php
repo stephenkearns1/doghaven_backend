@@ -413,7 +413,7 @@ public function breederSignin($companyname, $password){
     
     
     
-    public function UpdateUser($username, $newUsername, $newPassword){
+    public function UpdateUser($username, $newUsername,$newEmail, $newPassword){
          
          try{
              // ceates a new db connection instance
@@ -421,12 +421,13 @@ public function breederSignin($companyname, $password){
                 $dbcon= $db->getDBCon();
                 $dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 //$stmt = $dbcon->prepare("SELECT username FROM user WHERE username = ?");
-                $stmt = $dbcon->prepare("UPDATE user SET username = :newusername, password = :newpassword WHERE username = :username");
+                $stmt = $dbcon->prepare("UPDATE user SET username = :newusername, email = :newemail, password = :newpassword WHERE username = :username");
                // $stmt = $con->prepare("SELECT name,sname,address,email,dob FROM users WHERE username = ? AND password = ?");
                 
                 $stmt->bindParam(':username',$username);
                 $stmt->bindParam(':newusername', $newUsername);
                 $stmt->bindParam(':newpassword', $newPassword);
+                $stmt->bindParam(':newemail', $newEmail);
                 
                 
                if($stmt->execute()){

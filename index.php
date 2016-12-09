@@ -139,11 +139,12 @@ if(isset($_POST['checkifbreederexists'])){
 
 if(isset($_POST['updateUser'])){
       $original_username = $_POST['username'];
+      $newEmail = $_POST['newpassword'];
       $new_username = $_POST['newusername'];
       $new_password = $_POST['newpassword'];
       
       $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);   
-      $functionClass->UpdateUser($original_username, $new_username);
+      $functionClass->UpdateUser($original_username, $new_username, $newEmail, $hashed_password);
       //$functionClass->UpdateUser("stephenk", "stephenj");
 }
    
