@@ -452,6 +452,39 @@ public function breederSignin($companyname, $password){
         
     }
 
-
+    public function UpdateBreeder($companyname, $newcompanyname, $newemail, $newaddr, $newpassword){
+          try{
+             // ceates a new db connection instance
+                $db = new dbcon();
+                $dbcon= $db->getDBCon();
+                $dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $stmt = $dbcon->prepare("UPDATE breeder SET companyname = :newcompanyname, email = :newemail, password = :newpassword, address = :newaddress WHERE companyname = :companyname");
+                $stmt->bindParam(':companyname',$companyname);
+                $stmt->bindParam(':newcompanyname', $newcompanyname);
+                $stmt->bindParam(':newemail', $newemail);
+                $stmt->bindParam(':newpassword', $newpassword);
+                $stmt->bindParam(':newaddress', $newaddr);
+                
+                
+               if($stmt->execute()){
+                   print_r('success');
+               }else{
+                   print_r('failed');
+               }
+         
+            
+            
+           
+            
+          } catch (Exception $e) {
+           
+              print("error".$e);
+          }   
+          
+        
+        
+        //close the connection 
+        $stmt = null;
+    }
 }//end of function class 
 

@@ -147,6 +147,18 @@ if(isset($_POST['updateUser'])){
       $functionClass->UpdateUser($original_username, $new_username, $newEmail, $hashed_password);
       //$functionClass->UpdateUser("stephenk", "stephenj");
 }
+
+
+//Changing the name company is risky, due to to a copany not filling a promise and then changing there company name,
+// but then again a company is physically able to change after following the right procedure so we will allow it 
+if(isset($_POST['updateBreeder'])){
+    $original_companyname = $_POST['companyname'];
+    $new_companyname = $_POST['newcompanyname'];
+    $new_companyemail = $_POST['newemail'];
+    $new_address = $_POST['newaddr'];
+    $new_password = $_POST['newpassword'];
+    
+}
    
    
 
