@@ -177,9 +177,10 @@ public function breederSignin($companyname, $password){
     
     public function AddDog($dog_name, $dog_age, $dog_breed, $dog_company, $dog_color,     
                             $dillcurr, $dillpast, $dvac, $dvacmiss, 
-                            $phys1, $phys2, $phys3, $phys4, $phys5, 
-                            $beha1, $beha2, $beha3, $beha4, $beha5, 
-                            $soc1, $soc2, $soc3, $soc4, $soc5){
+                            $size, $fur, $body, $tolerance, $neutered, 
+                            $energy, $exercise, $intelligence, $playful, $instinct, 
+                            $people, $family, $dogs, $emotion, $sociability)
+    {
                                 
         
             
@@ -215,33 +216,33 @@ public function breederSignin($companyname, $password){
              
             
             
-            $stmt= $dbcon->prepare("INSERT INTO physical(phys1, phys2, phys3, phys4, phys5) VALUES(:phys1, :phys2, :phys3, :phys4, :phys5)");
-            $stmt->bindParam(':phys1',$phys1);
-            $stmt->bindParam(':phys2',$phys2);
-            $stmt->bindParam(':phys3',$phys3);
-            $stmt->bindParam(':phys4',$phys4);
-            $stmt->bindParam(':phys5',$phys5);
+            $stmt= $dbcon->prepare("INSERT INTO physical(size, fur, body, tolerance, neutered) VALUES(:size, :fur, :body, :tolerance, :neutered)");
+            $stmt->bindParam(':size',$size);
+            $stmt->bindParam(':fur',$fur);
+            $stmt->bindParam(':body',$body);
+            $stmt->bindParam(':tolerance',$tolerance);
+            $stmt->bindParam(':neutered',$neutered);
             $stmt->execute();
               
             
             
             
-            $stmt= $dbcon->prepare("INSERT INTO social(soc1, soc2, soc3, soc4, soc5) VALUES(:soc1, :soc2, :soc3, :soc4, :soc5)");
-            $stmt->bindParam(':soc1',$soc1);
-            $stmt->bindParam(':soc2',$soc2);
-            $stmt->bindParam(':soc3',$soc3);
-            $stmt->bindParam(':soc4',$soc4);
-            $stmt->bindParam(':soc5',$soc5);
+            $stmt= $dbcon->prepare("INSERT INTO social(people, family, dogs, emotion, sociability) VALUES(:people, :family, :dogs, :emotion, :sociability)");
+            $stmt->bindParam(':people',$people);
+            $stmt->bindParam(':family',$family);
+            $stmt->bindParam(':dogs',$dogs);
+            $stmt->bindParam(':emotion',$emotion);
+            $stmt->bindParam(':sociability',$sociability);
             $stmt->execute();
             
             
             
-            $stmt= $dbcon->prepare("INSERT INTO behaviour(beha1, beha2, beha3, beha4, beha5) VALUES(:beha1, :beha2, :beha3, :beha4, :beha5)");
-            $stmt->bindParam(':beha1',$beha1);
-            $stmt->bindParam(':beha2',$beha2);
-            $stmt->bindParam(':beha3',$beha3);
-            $stmt->bindParam(':beha4',$beha4);
-            $stmt->bindParam(':beha5',$beha5);
+            $stmt= $dbcon->prepare("INSERT INTO behaviour(energy, exercise, intelligence, playful, instinct) VALUES(:energy, :exercise, :intelligence, :playful, :instinct)");
+            $stmt->bindParam(':energy',$energy);
+            $stmt->bindParam(':exercise',$exercise);
+            $stmt->bindParam(':intelligence',$intelligence);
+            $stmt->bindParam(':playful',$playful);
+            $stmt->bindParam(':instinct',$instinct);
             $stmt->execute();
             
             
@@ -251,7 +252,7 @@ public function breederSignin($companyname, $password){
             $stmt= $dbcon->prepare("INSERT INTO medical(dillcurr, dillpast, dvac, dvacmiss) VALUES(:dillcurr, :dillpast, :dvac, :dvacmiss)");
             $stmt->bindParam(':dillcurr',$dillcurr);
             $stmt->bindParam(':dillpast',$dillpast);
-            $stmt->bindParam(':dvac',$vac);
+            $stmt->bindParam(':dvac',$dvac);
             $stmt->bindParam(':dvacmiss',$dvacmiss);
             $stmt->execute();
             
@@ -287,7 +288,7 @@ public function breederSignin($companyname, $password){
          } catch (PDOException $error) {
             //roll back the transaction if something failed
             $stmt = $dbcon->rollback();
-                echo "id".$physical_id;
+               // echo "id".$physical_id;
                 echo "Error: " . $error;
          
          } 
@@ -486,5 +487,50 @@ public function breederSignin($companyname, $password){
         //close the connection 
         $stmt = null;
     }
+    
+    public function GetCompanyDogs($companyname){
+          try{
+             // ceates a new db connection instance
+                $db = new dbcon();
+                $dbcon= $db->getDBCon();
+                $dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $stmt = $dbcon->prepare("   
+                                            SELECT
+                                                    dogs.dog_id, dogs.dog_name, dogs.dog_age, dogs.dog_breed, dogs.dog_company, dogs.dog_color,
+                                            		physical.size, physical.fur, physical.body,physical.tolerance,physical.neutered,
+                                            		behaviour.dog_id,behaviour.energy,behaviour.exercise,behaviour.intelligence,behaviour.playful,behaviour.instinct 
+                                            		,social.people,social.family,social.dogs,social.emotion,social.sociability
+                                            		,medical.dillcurr,medical.dillpast,medical.dvac,medical.dvacmiss
+                                            FROM dogs
+                                            INNER JOIN physical ON dogs.dog_id = physical.dog_id
+                                            INNER JOIN behaviour ON dogs.dog_id = behaviour.dog_id
+                                            INNER JOIN social ON dogs.dog_id = social.dog_id
+                                            INNER JOIN medical ON dogs.dog_id = medical.dog_id
+                                            WHERE dogs.dog_company = :companyname
+                                            GROUP BY dogs.dog_id
+                                            ORDER BY dog_name ASC;
+                                        ");
+               $stmt->bindParam(':companyname',$companyname);
+               $stmt->execute();
+               
+               $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+               echo json_encode($data);    
+           
+            
+            
+           
+            
+          } catch (Exception $e) {
+           
+              print("error".$e);
+          }   
+          
+        
+        
+        //close the connection 
+        $stmt = null;
+    }
+    
+    
 }//end of function class 
 

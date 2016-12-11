@@ -47,42 +47,47 @@ if(isset($_POST['adddog'])){
         $dillpast = $_POST['dillpast'];
         $dvac = $_POST['dvac'];
         $dvacmiss = $_POST['dvacmiss'];
-        $phys1 = $POST['phys1'];
-        $phys2 = $POST['phys2'];
-        $phys3 = $POST['phys3'];
-        $phys4 = $POST['phys4'];
-        $phys5 = $POST['phys5'];
-        $beha1 = $POST['beha1'];
-        $beha2 = $POST['beha2'];
-        $beha3 = $POST['beha3'];
-        $beha4 = $POST['beha4'];
-        $beha5 = $POST['beha5'];
-        $soc1 = $POST['soc1'];
-        $soc2 = $POST['soc2'];
-        $soc3 = $POST['soc3'];
-        $soc4 = $POST['soc4'];
-        $soc5 = $POST['soc5'];
+        $size = $_POST['size'];
+        $fur = $_POST['fur'];
+        $body = $_POST['body'];
+        $tolerance = $_POST['tolerance'];
+        $neutered = $_POST['neutered'];
+        $energy = $_POST['energy'];
+        $exercise = $_POST['exercise'];
+        $intelligence = $_POST['intelligence'];
+        $playful = $_POST['playful'];
+        $instinct = $_POST['instinct'];
+        $people = $_POST['people'];
+        $family = $_POST['family'];
+        $dogs = $_POST['dogs'];
+        $emotion = $_POST['emotion'];
+        $sociability = $_POST['sociability'];
         
         // echo "hello marken";
         //$functionClass->AddDog("rex", "18", "marktussle");
-       
-       $functionClass->AddDog($dog_name, $dog_age, $dog_breed, $dog_company, $dog_color, 
+        
+      
+    //print_r("Hello".$dog_name."Size:".$size);
+     
+     $functionClass->AddDog($dog_name, $dog_age, $dog_breed, $dog_company, $dog_color, 
                                 $dillcurr, $dillpast, $dvac, $dvacmiss, 
-                                $phys1, $phys2, $phys3, $phys4, $phys5, 
-                                $beha1, $beha2, $beha3, $beha4, $beha5, 
-                                $soc1, $soc2, $soc3, $soc4, $soc5);
+                                $size, $fur, $body, $tolerance, $neutered, 
+                                $energy, $exercise, $intelligence, $playful, $instinct, 
+                                $people, $family, $dogs, $emotion, $sociability);
+                                
+                               
                         
                         
-       /* $functionClass->AddDog("ste", "12", "Akita","BreedWeedz", "blue",     
+      /*
+      $functionClass->AddDog("ste", "12", "Akita","BreedWeedz", "blue",     
                                 "fresh", "young", "but", "old", 
                                 "yes", "gf", "gf", "gf", "gf", 
                                 "gf", "gf", "gf", "gf", "gf", 
                                 "gf", "gf", "gf", "gf", "gf");
+                                
+                        */
                 
-      $physical_id++;
-       $social_id++;
-       $behaviour_id++;
-       $medical_id++;*/
+    
 //}
 
 }
@@ -158,8 +163,21 @@ if(isset($_POST['updateBreeder'])){
     $new_address = $_POST['newaddr'];
     $new_password = $_POST['newpassword'];
     
+    $hashed_password = password_hash($new_password, PASSWORD_DEFAULT); 
+    
+    $functionClass->UpdateBreeder($original_companyname , $new_companyname,$new_companyemail
+                                    ,$new_address, $hashed_password);
+    
+    
 }
-   
-   
+
+
+//if(isset($_POST['GetCompanyDogs'])){
+
+    $companyname = $_POST['companyname'];
+    
+    //$functionClass->GetCompanyDogs($companyname);
+   $functionClass->GetCompanyDogs('BreedWeedz');
+//   }
 
 ?>
