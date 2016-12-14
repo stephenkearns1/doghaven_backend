@@ -175,11 +175,38 @@ public function breederSignin($companyname, $password){
      
     }//end of breederReg
     
+    public function UploadImage($image){
+    
+        
+        try {
+                $db = new dbcon();
+             $dbcon = $db->getDBCon();
+             $stmt = $dbcon->prepare("INSERT INTO images(image) VALUES(:image)");
+            
+             $stmt->bindParam(':image',$image);   
+             
+             if($stmt->execute()){
+                    echo 'success';
+                }else{
+                    echo 'failed';
+                }
+                
+              
+             }catch (PDOException $error) {
+                 print_r("Error occured".$error);
+             } 
+             
+             //end conntection
+             $stmt = null;
+            
+    }
+    
     public function AddDog($dog_name, $dog_age, $dog_breed, $dog_company, $dog_color,     
                             $dillcurr, $dillpast, $dvac, $dvacmiss, 
                             $size, $fur, $body, $tolerance, $neutered, 
                             $energy, $exercise, $intelligence, $playful, $instinct, 
                             $people, $family, $dogs, $emotion, $sociability)
+                            
     {
                                 
         
@@ -192,18 +219,6 @@ public function breederSignin($companyname, $password){
             $dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $stmt = $dbcon->beginTransaction();
         
-           
-            
-            /*
-               Values keep track of each of the records added so that the dog table can be updated 
-            */
-            /*$stmt = $dbcon->prepare("INSERT INTO dogs(dname, dage, dbreed, dcompany, dcolor, dillcurr, dillpast, dvac, dvacmiss) 
-                VALUES(:dname,:dage,:dbreed,:dcompany,:dcolor,:dillcurr,:dillpast,:dvac,:dvacmiss)");*/
-            //$stmt->query("INSERT INTO dim_medical(dillcurr, dillpast, dvac, dvacmiss) VALUES(:dillcurr, :dillpast, :dvac, :dvacmiss)");
-            /*$physical_id = (int) $dbcon->query('SELECT MAX(physical_id) FROM dim_physical;');  
-            echo "Max" + $physical_id;
-            $physical_id++;
-            echo "Max+1" + $physical_id;*/
             
             
             $stmt= $dbcon->prepare("INSERT INTO dogs(dog_name, dog_age, dog_breed, dog_company, dog_color) VALUES (:dog_name, :dog_age, :dog_breed, :dog_company, :dog_color)");
@@ -257,8 +272,6 @@ public function breederSignin($companyname, $password){
             $stmt->execute();
             
             
-
-            
             $stmt = $dbcon->commit();
             
         
@@ -311,8 +324,6 @@ public function breederSignin($companyname, $password){
          
          
                 
-                
-            
   
 
     
@@ -531,6 +542,48 @@ public function breederSignin($companyname, $password){
         $stmt = null;
     }
     
+    public GetAllDogs(){
+        
+        try{
+             // ceates a new db connection instance
+                $db = new dbcon();
+                $dbcon= $db->getDBCon();
+                $dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $stmt = $dbcon->prepare("   
+                                            SELECT
+                                                    dogs.dog_id, dogs.dog_name, dogs.dog_age, dogs.dog_breed, dogs.dog_company, dogs.dog_color,
+                                            		physical.size, physical.fur, physical.body,physical.tolerance,physical.neutered,
+                                            		behaviour.dog_id,behaviour.energy,behaviour.exercise,behaviour.intelligence,behaviour.playful,behaviour.instinct 
+                                            		,social.people,social.family,social.dogs,social.emotion,social.sociability
+                                            		,medical.dillcurr,medical.dillpast,medical.dvac,medical.dvacmiss
+                                            FROM dogs
+                                            INNER JOIN physical ON dogs.dog_id = physical.dog_id
+                                            INNER JOIN behaviour ON dogs.dog_id = behaviour.dog_id
+                                            INNER JOIN social ON dogs.dog_id = social.dog_id
+                                            INNER JOIN medical ON dogs.dog_id = medical.dog_id
+                                            GROUP BY dogs.dog_id;
+                                        ");
+                                        
+               $stmt->execute();
+               
+               $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+               echo json_encode($data);    
+           
+            
+            
+           
+            
+          } catch (Exception $e) {
+           
+              print("error".$e);
+          }   
+          
+        
+        
+        //close the connection 
+        $stmt = null;
+        
+    }
     
 }//end of function class 
 

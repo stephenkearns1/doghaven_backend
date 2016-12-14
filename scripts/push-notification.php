@@ -5,7 +5,7 @@ function send_notification ($tokens, $message)
     
 $url = 'https://FB.googleapis.com/FB/send';
 $fields = array (
-    'registration_ids' = $tokens,
+    'registration_ids' => $tokens,
     'data' => $message
     );
     

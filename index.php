@@ -1,6 +1,7 @@
 <?php
 
 include("scripts/functions.php");
+//include("scripts/upload.php");
 $functionClass = new functions();
 /*$behaviour_id = 'behaviour_id';
 $physical_id = $physical_id++;
@@ -62,12 +63,9 @@ if(isset($_POST['adddog'])){
         $dogs = $_POST['dogs'];
         $emotion = $_POST['emotion'];
         $sociability = $_POST['sociability'];
+        //$image = $_POST['image'];
         
-        // echo "hello marken";
-        //$functionClass->AddDog("rex", "18", "marktussle");
-        
-      
-    //print_r("Hello".$dog_name."Size:".$size);
+       
      
      $functionClass->AddDog($dog_name, $dog_age, $dog_breed, $dog_company, $dog_color, 
                                 $dillcurr, $dillpast, $dvac, $dvacmiss, 
@@ -75,21 +73,13 @@ if(isset($_POST['adddog'])){
                                 $energy, $exercise, $intelligence, $playful, $instinct, 
                                 $people, $family, $dogs, $emotion, $sociability);
                                 
-                               
-                        
-                        
-      /*
-      $functionClass->AddDog("ste", "12", "Akita","BreedWeedz", "blue",     
-                                "fresh", "young", "but", "old", 
-                                "yes", "gf", "gf", "gf", "gf", 
-                                "gf", "gf", "gf", "gf", "gf", 
-                                "gf", "gf", "gf", "gf", "gf");
-                                
-                        */
-                
-    
-//}
+}
 
+if(isset($_POST['uploadimage'])){
+        $image = $_POST['image'];
+        
+    $functionClass->UploadImage($image);
+    
 }
     
  if(isset($_POST['breederregister'])){
@@ -172,12 +162,23 @@ if(isset($_POST['updateBreeder'])){
 }
 
 
-//if(isset($_POST['GetCompanyDogs'])){
+if(isset($_GET['GetCompanyDogs'])){
 
     $companyname = $_POST['companyname'];
     
     //$functionClass->GetCompanyDogs($companyname);
    $functionClass->GetCompanyDogs('BreedWeedz');
-//   }
+    
+
+}
+
+if(isset($_GET['GetAllDogs'])){
+    //Get your variables 
+    
+    $functionClass->GetAllDogs(); 
+    
+    //call your function 
+    
+}
 
 ?>
