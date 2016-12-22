@@ -173,13 +173,18 @@ public function breederSignin($companyname, $password){
          //end conntection
          $stmt = null;
      
-    }//end of breederReg
+ }//end of breederReg
     
     public function UploadImage($image){
     
+    $data = base64_encode($image);
+
+    file_put_contents('../images/image.png', $data);
         
         try {
-                $db = new dbcon();
+            
+             
+             $db = new dbcon();
              $dbcon = $db->getDBCon();
              $stmt = $dbcon->prepare("INSERT INTO images(image) VALUES(:image)");
             
@@ -201,7 +206,21 @@ public function breederSignin($companyname, $password){
             
     }
     
-    public function AddDog($dog_name, $dog_age, $dog_breed, $dog_company, $dog_color,     
+    public function GetImage($image)
+    
+    {
+        
+        try {
+            $db = new dbcon();
+            $dbcon = $db->getDBCon();
+            $dbcon = setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $dbcon->prepare("SELECT image FROM images WHERE dog_id = ");
+        }catch (PDOException $e) {
+                 print_r("Error occured".$error);
+             } 
+    }
+    
+    public function AddDog($dog_name, $dog_age, $dog_sex, $dog_breed, $dog_company, $dog_color,     
                             $dillcurr, $dillpast, $dvac, $dvacmiss, 
                             $size, $fur, $body, $tolerance, $neutered, 
                             $energy, $exercise, $intelligence, $playful, $instinct, 
@@ -217,13 +236,14 @@ public function breederSignin($companyname, $password){
             $db = new dbcon();
             $dbcon = $db->getDBCon();
             $dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $stmt = $dbcon->beginTransaction();
+           // $stmt = $dbcon->beginTransaction();
         
             
             
-            $stmt= $dbcon->prepare("INSERT INTO dogs(dog_name, dog_age, dog_breed, dog_company, dog_color) VALUES (:dog_name, :dog_age, :dog_breed, :dog_company, :dog_color)");
+            $stmt= $dbcon->prepare("INSERT INTO dogs(dog_name, dog_age, dog_sex, dog_breed, dog_company, dog_color) VALUES (:dog_name, :dog_age, :dog_sex, :dog_breed, :dog_company, :dog_color)");
             $stmt->bindParam(':dog_name',$dog_name);
             $stmt->bindParam(':dog_age',$dog_age);
+            $stmt->bindParam(':dog_sex',$dog_sex);
             $stmt->bindParam(':dog_breed',$dog_breed);
             $stmt->bindParam(':dog_company',$dog_company);
             $stmt->bindParam(':dog_color',$dog_color);
@@ -272,58 +292,45 @@ public function breederSignin($companyname, $password){
             $stmt->execute();
             
             
-            $stmt = $dbcon->commit();
+            //$stmt = $dbcon->commit();
             
-        
-            /*
-               After each transaction increment the id's,
-               so that they can be linked and relationships are maintained
-            */
-            
-            //$stmt->bindParam(':dog_name',$dog_name);
-            //$stmt->bindParam(':dog_age',$dog_age);
-            //$stmt->bindParam(':dog_breed',$dog_breed);
-            //$stmt->bindParam(':dog_color',$dog_color);
-            //$stmt->bindParam(':dillcurr',$dillcurr);
-        //    $stmt->bindParam(':dillpast',$dillpast);
-          //  $stmt->bindParam(':dvac',$dvac);
-            //$stmt->bindParam(':dvacmiss',$dvacmiss);
-          
-            
-            //$stmt->query("INSERT INTO fact_dog(dog_name, dog_age, dog_breed, dog_color) VALUES(:dog_name, :dog_age, :dog_breed, :dog_color)");
-             
-            //$stmt = null;
-        
-        //       $dbcon->commit();
-        
-        
           
          } catch (PDOException $error) {
             //roll back the transaction if something failed
-            $stmt = $dbcon->rollback();
+            // $stmt = $dbcon->rollback();
                // echo "id".$physical_id;
                 echo "Error: " . $error;
          
          } 
-         
-        /*if($stmt->execute()){
-                echo 'success';
-            }else{
-                echo 'failed';
-            }*/
-            
-          
-         /*}catch (PDOException $error) {
-             print_r("Error occured".$error);
-         } 
-         
-         //end conntection
-         $stmt = null;*/
      
     }
+
          
          
-                
+    public function DisplayImage($dog_id){
+        try {
+            $db = new dbcon();
+            $dbcon = $db->getDBCon();
+            $dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $dbcon->prepare("SELECT image FROM images WHERE images.dog_id = 7");
+            $stmt->bindParam(':dog_id',$dog_id);
+            $stmt->execute();
+               
+            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($data);
+        } catch (Exception $e) {
+           
+              print("error".$e);
+          }   
+          
+        
+        
+        //close the connection 
+        $stmt = null;
+    }
+        
+    
+    
   
 
     
@@ -507,7 +514,7 @@ public function breederSignin($companyname, $password){
                 $dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $stmt = $dbcon->prepare("   
                                             SELECT
-                                                    dogs.dog_id, dogs.dog_name, dogs.dog_age, dogs.dog_breed, dogs.dog_company, dogs.dog_color,
+                                                    dogs.dog_id, dogs.dog_name, dogs.dog_age, dogs.dog_breed,dogs.dog_sex, dogs.dog_company, dogs.dog_color,
                                             		physical.size, physical.fur, physical.body,physical.tolerance,physical.neutered,
                                             		behaviour.dog_id,behaviour.energy,behaviour.exercise,behaviour.intelligence,behaviour.playful,behaviour.instinct 
                                             		,social.people,social.family,social.dogs,social.emotion,social.sociability
@@ -525,7 +532,7 @@ public function breederSignin($companyname, $password){
                $stmt->execute();
                
                $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-               echo json_encode($data);    
+               echo json_encode($data);  
            
             
             
@@ -542,7 +549,7 @@ public function breederSignin($companyname, $password){
         $stmt = null;
     }
     
-    public GetAllDogs(){
+    public function GetAllDogs(){
         
         try{
              // ceates a new db connection instance
@@ -551,7 +558,7 @@ public function breederSignin($companyname, $password){
                 $dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $stmt = $dbcon->prepare("   
                                             SELECT
-                                                    dogs.dog_id, dogs.dog_name, dogs.dog_age, dogs.dog_breed, dogs.dog_company, dogs.dog_color,
+                                                    dogs.dog_id, dogs.dog_name, dogs.dog_age, dogs.dog_breed,dogs.dog_sex, dogs.dog_company, dogs.dog_color,
                                             		physical.size, physical.fur, physical.body,physical.tolerance,physical.neutered,
                                             		behaviour.dog_id,behaviour.energy,behaviour.exercise,behaviour.intelligence,behaviour.playful,behaviour.instinct 
                                             		,social.people,social.family,social.dogs,social.emotion,social.sociability
@@ -584,6 +591,306 @@ public function breederSignin($companyname, $password){
         $stmt = null;
         
     }
+    
+    
+    function GetUserPerferances($userID){
+             try{
+             // ceates a new db connection instance
+                $db = new dbcon();
+                $dbcon= $db->getDBCon();
+                $dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $stmt = $dbcon->prepare("   
+                                            SELECT * FROM userprefs
+                                            WHERE user_id = :user_id;
+                                            
+                                        ");
+                                        
+               $stmt->bindParam(':user_id',$userID);                            
+               $stmt->execute();
+                        
+               $data = $stmt->fetch(PDO::FETCH_ASSOC);
+               echo json_encode($data);    
+           
+            
+            
+           
+            
+          } catch (Exception $e) {
+           
+              print("error".$e);
+          }   
+          
+        
+        
+        //close the connection 
+        $stmt = null;
+    }
+    
+     function AddPref(  $user_id,$size, $fur, $body, $tolerance, $neutered, 
+                        $energy, $exercise, $intelligence, $playful, $instinct, 
+                        $people, $family, $dogs, $emotion, $sociability){
+             try{
+             // ceates a new db connection instance
+                $db = new dbcon();
+                $dbcon= $db->getDBCon();
+                $dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $stmt = $dbcon->prepare("   
+                                           DELETE FROM  userprefs
+                                            WHERE user_id=:userID;
+                                           
+                                           
+                                           
+                                           
+                                           INSERT INTO userprefs(user_id,size,fur,body,tolerance,
+                                           neutered,energy,exercise,intelligence,playful,
+                                           instinct,people,family,dogs,emotion,sociability)
+                                           
+                                           VALUES (:userID,:size,:fur,:body,:tolerance,:neutered,
+                                                    :energy,:exercise,:intelligence,:playful,
+                                           :instinct,:people,:family,:dogs,:emotion,:sociability);
+                                           
+                                           ");
+                                           
+                                           
+                                           
+                                        
+            $stmt->bindParam(':userID',$user_id);  
+            $stmt->bindParam(':size',$size);
+            $stmt->bindParam(':fur',$fur);
+            $stmt->bindParam(':body',$body);
+            $stmt->bindParam(':tolerance',$tolerance);
+            $stmt->bindParam(':neutered',$neutered);
+            $stmt->bindParam(':energy',$energy);
+            $stmt->bindParam(':exercise',$exercise);
+            $stmt->bindParam(':intelligence',$intelligence);
+            $stmt->bindParam(':playful',$playful);
+            $stmt->bindParam(':instinct',$instinct);
+            $stmt->bindParam(':people',$people);
+            $stmt->bindParam(':family',$family);
+            $stmt->bindParam(':dogs',$dogs);
+            $stmt->bindParam(':emotion',$emotion);
+            $stmt->bindParam(':sociability',$sociability);
+            $stmt->execute();
+                        
+            
+           
+            
+            
+           
+            
+          } catch (Exception $e) {
+           
+              print("error".$e);
+          }   
+          
+        
+        
+        //close the connection 
+        $stmt = null;
+    }
+    
+    
+    public function CheckCompanyDogExists($companyname){
+         try{
+             // ceates a new db connection instance
+                $db = new dbcon();
+                $dbcon= $db->getDBCon();
+                $dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $stmt = $dbcon->prepare("   
+                                            SELECT dog_company
+                                            FROM dogs
+                                            WHERE dog_company = :companyname;
+                                        ");
+                                        
+                                       
+                                           
+                                           
+                                       
+               $stmt->bindParam(':companyname',$companyname);
+                                        
+               $stmt->execute();
+               
+               
+              
+               
+               if($stmt->fetch(PDO::FETCH_ASSOC)){
+                   echo "true";
+               }else{
+                   echo "false";
+               }
+           
+            
+            
+           
+            
+          } catch (Exception $e) {
+           
+              print("error".$e);
+          }   
+          
+        
+        
+        //close the connection 
+        $stmt = null;
+        
+    }
+    
+    
+    
+     public function DeleteDog($dog_id){
+        
+      
+        try {
+            
+            $db = new dbcon();
+            $dbcon = $db->getDBCon();
+            $dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+           // $stmt = $dbcon->beginTransaction();
+        
+             
+            
+            $stmt= $dbcon->prepare("DELETE  FROM physical WHERE dog_id = :dog_id;");
+            $stmt->bindParam(':dog_id',$dog_id);
+            $stmt->execute();
+            
+            
+            $stmt= $dbcon->prepare("DELETE FROM  behaviour WHERE dog_id = :dog_id;");
+            $stmt->bindParam(':dog_id',$dog_id);
+            $stmt->execute();
+              
+            
+            
+            
+            $stmt= $dbcon->prepare("DELETE  FROM  social WHERE dog_id = :dog_id;");
+            $stmt->bindParam(':dog_id',$dog_id);
+            $stmt->execute();
+            
+            
+            
+            $stmt= $dbcon->prepare("DELETE  FROM medical  WHERE dog_id = :dog_id;");
+            $stmt->bindParam(':dog_id',$dog_id);
+            $stmt->execute();
+            
+            
+            
+            
+            $stmt= $dbcon->prepare("DELETE  FROM  images WHERE dog_id = :dog_id");
+            $stmt->bindParam(':dog_id',$dog_id);
+            $stmt->execute();
+            
+            
+            $stmt= $dbcon->prepare("DELETE  FROM  dogs WHERE dog_id = :dog_id");
+            $stmt->bindParam(':dog_id',$dog_id);
+            $stmt->execute();
+            
+           
+        
+            
+           //$stmt = $dbcon->commit();
+            
+        
+           
+        
+          
+         } catch (PDOException $error) {
+            //roll back the transaction if something failed
+            //$stmt = $dbcon->rollback();
+               // echo "id".$physical_id;
+                echo "Error: " . $error;
+         
+         } 
+     
+         //end conntection
+         $stmt = null;
+     
+    
+        
+    }
+    
+    public function GetStudDogs($dog_breed){
+          try{
+             // ceates a new db connection instance
+                $db = new dbcon();
+                $dbcon= $db->getDBCon();
+                $dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $stmt = $dbcon->prepare("   
+                                            SELECT
+                                                    dogs.dog_id, dogs.dog_name, dogs.dog_age, dogs.dog_breed,dogs.dog_sex, dogs.dog_company, dogs.dog_color,
+                                            		physical.size, physical.fur, physical.body,physical.tolerance,physical.neutered,
+                                            		behaviour.dog_id,behaviour.energy,behaviour.exercise,behaviour.intelligence,behaviour.playful,behaviour.instinct 
+                                            		,social.people,social.family,social.dogs,social.emotion,social.sociability
+                                            		,medical.dillcurr,medical.dillpast,medical.dvac,medical.dvacmiss
+                                            FROM dogs
+                                            INNER JOIN physical ON dogs.dog_id = physical.dog_id
+                                            INNER JOIN behaviour ON dogs.dog_id = behaviour.dog_id
+                                            INNER JOIN social ON dogs.dog_id = social.dog_id
+                                            INNER JOIN medical ON dogs.dog_id = medical.dog_id
+                                            WHERE dogs.dog_breed = :breed;
+                                        ");
+                                        
+                                        
+               $stmt->bindParam(':breed',$dog_breed);
+               $stmt->execute();
+               
+             //  if($stmt->fetchAll(PDO::FETCH_ASSOC)){
+                   $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                   echo json_encode($data);  
+             //  }else{
+                   //does not exist 
+               //   echo "false";
+               //}
+                 
+           
+            
+            
+           
+            
+          } catch (Exception $e) {
+           
+              print("error".$e);
+          }   
+          
+        
+        
+        //close the connection 
+        $stmt = null;
+        
+    
+    }
+    
+    
+    public function getImage2($dog_id){
+         try{
+             // ceates a new db connection instance
+                $db = new dbcon();
+                $dbcon= $db->getDBCon();
+                $dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $stmt = $dbcon->prepare("SELECT * FROM images WHERE dog_id = :dog_id;");
+                $stmt->bindParam(':dog_id',$dog_id);
+                $stmt->execute();
+               
+                $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                echo json_encode($data);    
+           
+            
+            
+           
+            
+          } catch (Exception $e) {
+           
+              print("error".$e);
+          }   
+          
+        
+        
+        //close the connection 
+        $stmt = null;
+        
+        
+    }
+    
+    
+     
     
 }//end of function class 
 
